@@ -3,7 +3,7 @@ import * as todoService from '../services/todo-service.js'
 export const getAll = async (req, res, next) => {
     try{
         const { search } = req.query;
-        const todos = await todoService.getTodos(search);
+        const todos = await todoService.getAllTodos(search);
         res.status(200).json(todos);
     } catch(err){
         next(err)
@@ -25,9 +25,6 @@ export const getById = async (req, res, next) => {
 export const create = async (req, res, next) => {
     try{
         const { title, description, completed } = req.body;
-        if(!title || typeof title !== 'string'){
-            return res.status(400).json({message: 'Field "title" is required'});
-        }
         const todo = await todoService.createTodo({ title, description, completed });
         res.status(201).json(todo)
     } catch(err){

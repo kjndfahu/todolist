@@ -1,50 +1,46 @@
-// In-memory store for tasks
-const tasks = [];
-
-export const getTodos = (search) => {
-    if (!search) return tasks;
-    const q = String(search).toLowerCase();
-    return tasks.filter((t) => t.title.toLowerCase().includes(q));
-};
-
-export const getTodoById = (id) => tasks.find((t) => t.id === String(id));
+import {
+    saveTodo,
+    findAllTodos,
+    findTodoById,
+    updateTodoById,
+    deleteTodoById
+} from "../repository/todo-dal.js";
 
 export const createTodo = (data) => {
-    const now = new Date();
-    const newTask = {
-        id: Date.now().toString(),
+    const todo = {
         title: data.title,
         description: data.description ?? "",
         completed: Boolean(data.completed) || false,
-        completedAt: data.completed ? now : null,
-        createdAt: now,
+        completedAt: data.completed ? new Date() : null,
     };
-    tasks.push(newTask);
-    return newTask;
+    return saveTodo(todo);
 };
 
-export const updateTodo = (id, data) => {
-    const idx = tasks.findIndex((t) => t.id === String(id));
-    if (idx === -1) return null;
-    const existing = tasks[idx];
+export const getAllTodos = (searchQuery) => {
+    return findAllTodos(searchQuery);
+};
+
+export const getTodoById = (id) => {
+    return findTodoById(id);
+};
+
+export const updateTodo = async (id, data) => {
+    const existing = await findTodoById(id);
+    if (!existing) return null;
 
     const willBeCompleted =
         typeof data.completed === 'boolean' ? data.completed : existing.completed;
 
-    const updated = {
-        ...existing,
+    const updateData = {
         title: data.title ?? existing.title,
         description: data.description ?? existing.description,
         completed: willBeCompleted,
         completedAt: willBeCompleted ? (existing.completedAt ?? new Date()) : null,
     };
-    tasks[idx] = updated;
-    return updated;
+
+    return updateTodoById(id, updateData);
 };
 
 export const deleteTodo = (id) => {
-    const idx = tasks.findIndex((t) => t.id === String(id));
-    if (idx === -1) return null;
-    const [removed] = tasks.splice(idx, 1);
-    return removed;
+    return deleteTodoById(id);
 };
