@@ -11,7 +11,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Mount REST API under /api/tasks
 app.use("/api/tasks", taskRoutes)
 
 app.use(errorHandler);
